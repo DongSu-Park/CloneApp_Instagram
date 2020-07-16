@@ -61,9 +61,9 @@ class LoginActivity : AppCompatActivity() {
 
         LoginManager.getInstance()
             .registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-                override fun onSuccess(result: LoginResult?) {
+                override fun onSuccess(result: LoginResult?) { // 페이스북 로그인 성공 시
                     Log.d(TAG, "facebook:onSuccess:$result")
-                    handleFacebookAccessToken(result?.accessToken)
+                    handleFacebookAccessToken(result?.accessToken) // 페이스북 토큰 값 넘겨주기
                 }
 
                 override fun onCancel() {
