@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.flore.instagramclone.R
+import com.flore.instagramclone.navigation.model.ContentDTO
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_add_photo.*
 import java.text.SimpleDateFormat
@@ -16,13 +19,17 @@ class AddPhotoActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0 // 리퀘스트 번호
     var storage: FirebaseStorage? = null
     var photoUri: Uri? = null
+    var auth: FirebaseAuth? = null
+    var firestore: FirebaseFirestore? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_photo)
 
-        // Firebase Cloud Storage 초기화
-        storage = FirebaseStorage.getInstance()
+        // Firebase 초기화
+        storage = FirebaseStorage.getInstance() // Cloud Storage
+        auth = FirebaseAuth.getInstance() // Personal Auth
+        firestore = FirebaseFirestore.getInstance() // Cloud Store (DB)
 
         // 엑티비티 인텐트 실행하자마자 갤러리 화면이 열림
         var photoPickerIntent = Intent(Intent.ACTION_PICK)
@@ -61,9 +68,26 @@ class AddPhotoActivity : AppCompatActivity() {
         var storageRef =
             storage?.reference?.child("images")?.child(imageFileName) // 파이어베이스 클라우드 스토리지 저장 경로
 
-        // 업로드 이벤트
+        // 업로드 이벤트 (Store에 업로드하고 해당 주소를 가져옴, 콜백 형식)
         storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
-            Toast.makeText(this, getString(R.string.upload_success), Toast.LENGTH_LONG).show()
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                var contentDTO = ContentDTO()
+
+                contentDTO.imageUrl = uri.toString()
+                contentDTO.uid = auth?.currentUser?.uid
+                contentDTO.userId = auth?.currentUser?.email
+                contentDTO.explain = addphoto_edit_explain.text.toString()
+                contentDTO.timestamp = System.currentTimeMillis()
+
+                var firestoreUpload = firestore?.collection("images")?.document()?.set(contentDTO)
+
+                if (firestoreUpload != null) {
+                    Toast.makeText(this, getString(R.string.upload_success), Toast.LENGTH_LONG)
+                        .show()
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                }
+            }
         }
     }
 }
