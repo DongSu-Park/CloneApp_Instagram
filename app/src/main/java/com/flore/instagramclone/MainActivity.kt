@@ -67,5 +67,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
             1
         )
+        // 디테일 뷰 프레그먼트를 메인화면으로 세팅
+        bottom_navigation.selectedItemId = R.id.home_menu
     }
 }
