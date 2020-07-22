@@ -38,11 +38,11 @@ class DetailViewFragment : Fragment() {
 
         init { // 생성자
             firestore?.collection("images")?.orderBy("timestamp")
-                ?.addSnapshotListener { value, error ->
+                ?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear() // 리스트 초기화
                     contentUidList.clear() // 리스트 초기화
 
-                    for (snapshot in value!!.documents) {
+                    for (snapshot in querySnapshot!!.documents) {
                         var item = snapshot.toObject(ContentDTO::class.java)
                         contentDTOs.add(item!!) // 이미지 컨텐츠 내용 추가
                         contentUidList.add(snapshot.id) // Uid 내용 추가
