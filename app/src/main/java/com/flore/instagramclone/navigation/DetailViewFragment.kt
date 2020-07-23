@@ -41,6 +41,9 @@ class DetailViewFragment : Fragment() {
                 ?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear() // 리스트 초기화
                     contentUidList.clear() // 리스트 초기화
+                    if (querySnapshot == null) { // 로그아웃된 경우 null이 발생하기 때문에 이에 대한 exception 처리
+                        return@addSnapshotListener
+                    }
 
                     for (snapshot in querySnapshot!!.documents) {
                         var item = snapshot.toObject(ContentDTO::class.java)
@@ -89,10 +92,22 @@ class DetailViewFragment : Fragment() {
                 favoriteEvent(position)
             }
 
+            // 좋아요 버튼 클릭 후 이미지 변경
             if (contentDTOs!![position].favorites.containsKey(uid)) {
                 viewHolder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
             } else {
                 viewHolder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
+            }
+
+            // 이미지 클릭 이벤트
+            viewHolder.detailviewitem_profile_image.setOnClickListener {
+                var fragment = UserFragment()
+                var bundle = Bundle()
+                bundle.putString("destinationUid", contentDTOs[position].uid)
+                bundle.putString("userId", contentDTOs[position].userId)
+                fragment.arguments = bundle
+                activity?.supportFragmentManager?.beginTransaction()
+                    ?.replace(R.id.content_main, fragment)?.commit() // 프레그먼트를 UserFragment로 변경
             }
         }
 
@@ -113,6 +128,5 @@ class DetailViewFragment : Fragment() {
                 transaction.set(tsDoc, contentDTO) // 트렌젝션을 종료하고 변경된 값을 온라인에서도 변경
             }
         }
-
     }
 }

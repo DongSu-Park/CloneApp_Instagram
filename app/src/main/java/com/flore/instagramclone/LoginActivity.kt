@@ -27,6 +27,10 @@ class LoginActivity : AppCompatActivity() {
     var googleSignInClient: GoogleSignInClient? = null // 구글 계정 Auth
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null // 페이스북 계정 Auth
+    override fun onStart() {
+        super.onStart()
+        intentMainPage(auth?.currentUser)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +56,6 @@ class LoginActivity : AppCompatActivity() {
         btn_login_facebook.setOnClickListener { // 페이스북 로그인 버튼
             facebookLogin()
         }
-
     }
 
     fun facebookLogin() { // 페이스북 로그인 기능 실행
@@ -128,18 +131,31 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun signinAndSignup() { // 첫 사용자인 경우 회원가입을 하고 로그인을 함
-        auth?.createUserWithEmailAndPassword(et_email.text.toString(), et_password.text.toString())
-            ?.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // 계정이 생성 되었을 경우
-                    intentMainPage(task.result?.user)
-                } else if (!task.exception?.message.isNullOrEmpty()) {
-                    // 로그인 에러가 나왔을 경우 에러 메세지 표시
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                } else {
-                    signinEmail()
+        if (et_email.text?.toString() == "" || et_password.text?.toString() == "") {
+            Toast.makeText(
+                this,
+                "Email or Password is Empty. \nPlease check the Email or Password",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        } else {
+
+            auth?.createUserWithEmailAndPassword(
+                et_email.text.toString(),
+                et_password.text.toString()
+            )
+                ?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // 계정이 생성 되었을 경우
+                        intentMainPage(task.result?.user)
+                    } else if (!task.exception?.message.isNullOrEmpty()) {
+                        // 로그인 에러가 나왔을 경우 에러 메세지 표시
+                        Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+                    } else {
+                        signinEmail()
+                    }
                 }
-            }
+        }
     }
 
     fun signinEmail() { // 기존 사용자인 경우 로그인을 함
@@ -158,6 +174,7 @@ class LoginActivity : AppCompatActivity() {
     fun intentMainPage(user: FirebaseUser?) {
         if (user != null) { // user 인자가 존재할 경우
             startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
