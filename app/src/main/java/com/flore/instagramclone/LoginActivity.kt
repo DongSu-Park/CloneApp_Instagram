@@ -27,6 +27,9 @@ class LoginActivity : AppCompatActivity() {
     var googleSignInClient: GoogleSignInClient? = null // 구글 계정 Auth
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null // 페이스북 계정 Auth
+    companion object {
+        const val TAG = "LoginActivity"
+    }
     override fun onStart() {
         super.onStart()
         intentMainPage(auth?.currentUser)
@@ -178,7 +181,5 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        const val TAG = "LoginActivity"
-    }
+
 }

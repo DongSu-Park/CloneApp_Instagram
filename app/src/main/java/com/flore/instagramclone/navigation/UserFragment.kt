@@ -27,6 +27,9 @@ class UserFragment : Fragment() {
     var uid: String? = null
     var auth: FirebaseAuth? = null
     var currentUserUid: String? = null
+    companion object{
+        var PICK_PROFILE_FROM_ALBUM = 10
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
@@ -35,34 +38,44 @@ class UserFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         currentUserUid = auth?.currentUser?.uid // 현재 로그인한 유저의 uid를 가져옴
 
-        if (uid == currentUserUid) { // 자신의 uid와 가져온 uid 값이 일치하면 자신 페이지로 이동
-            fragmentView?.btn_account_follow_signout?.text = getString(R.string.signout) // 자신 페이지의 경우 버튼을 "Signout"
+        // 자신의 uid와 가져온 uid 값이 일치하면 자신 페이지로 이동, 다른 경우 상대방의 유저페이지 나타내기
+        if (uid == currentUserUid) {
+            fragmentView?.btn_account_follow_signout?.text = getString(R.string.signout)
             fragmentView?.btn_account_follow_signout?.setOnClickListener {
                 activity?.finish()
                 startActivity(Intent(activity, LoginActivity::class.java)) // 현재 엑티비티를 종료하고 로그인 엑티비티로 이동
                 auth?.signOut() // auth의 인자값에 있는 uid를 로그아웃 요청
             }
-        } else { // 다른 경우 상대방의 유저페이지 나타내기
-            fragmentView?.btn_account_follow_signout?.text = getString(R.string.follow) // 상대 페이지의 경우 버튼을 "follow"
+        } else {
+            fragmentView?.btn_account_follow_signout?.text = getString(R.string.follow)
             var mainactivity = (activity as MainActivity)
-            mainactivity?.toolbar_username?.text = arguments?.getString("userId") // 로그인한 유저 id를 가져와서 텍스트 세팅
-            mainactivity?.btn_toolbar_back?.setOnClickListener {
-                mainactivity.bottom_navigation.selectedItemId = R.id.home_menu // 뒤로가기 버튼을 누르면 홈 메뉴로 이동하는 이벤트로 설정
-            }
+            mainactivity?.toolbar_username?.text = arguments?.getString("userId")
+
             // 유저 상세 페이지에는 타이틀 이미지를 없에고 back 버튼과 해당 유저 id만 나타나게 함.
-            mainactivity?.toolbar_title_image?.visibility = View.GONE
-            mainactivity?.toolbar_username?.visibility = View.VISIBLE
-            mainactivity?.btn_toolbar_back?.visibility = View.VISIBLE
+            setToolbarUpdate(mainactivity)
+
+            mainactivity?.btn_toolbar_back?.setOnClickListener {
+                mainactivity.bottom_navigation.selectedItemId = R.id.home_menu
+            }
         }
 
-        fragmentView?.recyclerview_account?.adapter = UserFragmentRecyclerViewAdapter() // 리사이클러뷰 어댑터
+        fragmentView?.recyclerview_account?.adapter = UserFragmentRecyclerViewAdapter()
         fragmentView?.recyclerview_account?.layoutManager = GridLayoutManager(activity!!, 3) // 한 줄에 그리드 레이아웃 3개로 리사이클러뷰 설정
+
+        // 자신의 프로필 이미지 설정
+        getProfileImage()
+
+        // 프로필 이미지 변경 엑티비티 요청 (프로필 이미지 클릭 이벤트)
+        fragmentView?.iv_account_profile?.setOnClickListener {
+            var photoPickerIntent = Intent(Intent.ACTION_PICK)
+            photoPickerIntent.type = "image/*"
+            activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
+        }
 
         return fragmentView // 프레그먼트 뷰 설정
     }
 
-    inner class UserFragmentRecyclerViewAdapter :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() { // 어댑터 설정
+    inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() { // 어댑터 설정
         var contentDTOs: ArrayList<ContentDTO> = arrayListOf()
 
         init {
@@ -104,6 +117,24 @@ class UserFragment : Fragment() {
                 .load(contentDTOs[position].imageUrl)
                 .apply(RequestOptions().centerCrop()).into(imageview)
         }
+    }
 
+    fun getProfileImage(){
+        firestore?.collection("profileImages")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+            if (documentSnapshot == null){
+                return@addSnapshotListener
+            }
+
+            if (documentSnapshot.data != null){
+                var url = documentSnapshot.data!!["image"]
+                Glide.with(activity!!).load(url).apply(RequestOptions().circleCrop()).into(fragmentView?.iv_account_profile!!)
+            }
+        }
+    }
+
+    fun setToolbarUpdate(mainactivity: MainActivity) {
+        mainactivity.toolbar_title_image?.visibility = View.GONE
+        mainactivity.toolbar_username?.visibility = View.VISIBLE
+        mainactivity.btn_toolbar_back?.visibility = View.VISIBLE
     }
 }
