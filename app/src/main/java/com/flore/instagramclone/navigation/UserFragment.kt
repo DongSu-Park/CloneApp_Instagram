@@ -206,7 +206,6 @@ class UserFragment : Fragment() {
                         fragmentView?.btn_account_follow_signout?.background?.setColorFilter(ContextCompat.getColor(activity!!, R.color.colorLightGray), PorterDuff.Mode.MULTIPLY)
                     }
 
-
                 } else{
                     if (uid != currentUserUid){
                         fragmentView?.btn_account_follow_signout?.text = getString(R.string.follow)
