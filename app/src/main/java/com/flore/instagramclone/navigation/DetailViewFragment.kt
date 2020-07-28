@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.R
+import com.flore.instagramclone.navigation.model.AlarmDTO
 import com.flore.instagramclone.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -125,6 +126,7 @@ class DetailViewFragment : Fragment() {
             viewHolder.detailviewitem_comment_imageview.setOnClickListener { v ->
                 var intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
+                intent.putExtra("destinationUid",contentDTOs[position].uid)
                 startActivity(intent)
             }
         }
@@ -142,9 +144,21 @@ class DetailViewFragment : Fragment() {
                 } else {
                     contentDTO?.favoriteCount = contentDTO?.favoriteCount!! + 1
                     contentDTO.favorites[uid!!] = true // uid 값 hashMap에 리스트로 저장
+                    favoriteAlarm(contentDTOs[position].uid!!)
                 }
                 transaction.set(tsDoc, contentDTO) // 트렌젝션을 종료하고 변경된 값을 온라인에서도 변경
             }
+        }
+
+        fun favoriteAlarm(destinationUid : String?){
+            var alarmDTO = AlarmDTO()
+            alarmDTO.destinationUid = destinationUid
+            alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
+            alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
+            alarmDTO.kind = 0
+            alarmDTO.timestamp = System.currentTimeMillis()
+            FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
         }
     }
 }

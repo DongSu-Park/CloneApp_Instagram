@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.R
+import com.flore.instagramclone.navigation.model.AlarmDTO
 import com.flore.instagramclone.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,10 +19,13 @@ import kotlinx.android.synthetic.main.item_comment.view.*
 
 class CommentActivity : AppCompatActivity() {
     var contentUid : String? = null
+    var destinationUid : String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comment)
         contentUid = intent.getStringExtra("contentUid")
+        destinationUid = intent.getStringExtra("destinationUid")
 
         rv_comment.adapter = CommentRecyclerviewAdapter()
         rv_comment.layoutManager = LinearLayoutManager(this)
@@ -34,7 +38,7 @@ class CommentActivity : AppCompatActivity() {
             comment.timestamp = System.currentTimeMillis()
 
             FirebaseFirestore.getInstance().collection("images").document(contentUid!!).collection("comments").document().set(comment)
-
+            commentAlarm(destinationUid!!, et_comment_message.text.toString())
             et_comment_message.setText("")
         }
     }
@@ -89,6 +93,16 @@ class CommentActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
 
+    fun commentAlarm(destinationUid : String, message : String){
+        var alarmDTO = AlarmDTO()
+        alarmDTO.destinationUid = destinationUid
+        alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
+        alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
+        alarmDTO.timestamp = System.currentTimeMillis()
+        alarmDTO.kind = 1
+        alarmDTO.message = message
+        FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
     }
 }

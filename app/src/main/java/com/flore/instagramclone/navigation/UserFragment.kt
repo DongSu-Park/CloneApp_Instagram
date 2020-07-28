@@ -20,6 +20,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.LoginActivity
 import com.flore.instagramclone.MainActivity
 import com.flore.instagramclone.R
+import com.flore.instagramclone.navigation.model.AlarmDTO
 import com.flore.instagramclone.navigation.model.ContentDTO
 import com.flore.instagramclone.navigation.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
@@ -161,21 +162,23 @@ class UserFragment : Fragment() {
         var tsDocFollower = firestore?.collection("users")?.document(uid!!)
         firestore?.runTransaction { transaction ->
             var followDTO = transaction.get(tsDocFollower!!).toObject(FollowDTO::class.java)
-            if (followDTO == null){
+            if (followDTO == null){ // 최초로 팔로워 할 경우
                 followDTO = FollowDTO()
                 followDTO!!.followerCount = 1
                 followDTO!!.followers[currentUserUid!!] = true
+                followerAlarm(uid!!)
 
                 transaction.set(tsDocFollower, followDTO!!)
                 return@runTransaction
             }
 
-            if (followDTO!!.followers.containsKey(currentUserUid)){
+            if (followDTO!!.followers.containsKey(currentUserUid)){ // 팔로워 취소 카운트 -1
                 followDTO!!.followerCount = followDTO!!.followerCount - 1
                 followDTO!!.followers.remove(currentUserUid!!)
-            } else {
+            } else { // 팔로워 카운트 +1
                 followDTO!!.followerCount = followDTO!!.followerCount + 1
                 followDTO!!.followers[currentUserUid!!] = true
+                followerAlarm(uid!!)
             }
             transaction.set(tsDocFollower, followDTO!!)
             return@runTransaction
@@ -227,6 +230,16 @@ class UserFragment : Fragment() {
                 Glide.with(activity!!).load(url).apply(RequestOptions().circleCrop()).into(fragmentView?.iv_account_profile!!)
             }
         }
+    }
+
+    fun followerAlarm(destinationUid : String){
+        var alarmDTO = AlarmDTO()
+        alarmDTO.destinationUid = destinationUid
+        alarmDTO.userId = auth?.currentUser?.email
+        alarmDTO.uid = auth?.currentUser?.uid
+        alarmDTO.kind = 2
+        alarmDTO.timestamp = System.currentTimeMillis()
+        FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
     }
 
     fun setToolbarUpdate(mainactivity: MainActivity) {
