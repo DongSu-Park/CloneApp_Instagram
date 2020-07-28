@@ -13,5 +13,5 @@ data class AlarmDTO (
 * kind 옵션 번호
 * favorite(좋아요) = 0 (DetailViewFragment)
 * comment(댓글 등록) = 1 (CommentActivity)
-*
+* follow(팔로우) = 2 (UserFragment)
 * */
