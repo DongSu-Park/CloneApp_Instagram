@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".navigation.CommentActivity"></activity>
+        <activity android:name=".navigation.CommentActivity"/>
         <activity android:name=".navigation.AddPhotoActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
@@ -43,6 +43,16 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <!--Firebase Cloud Message Init-->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/push_icon"/>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent"/>
+
     </application>
 
 </manifest>
