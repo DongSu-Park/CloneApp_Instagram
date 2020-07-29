@@ -15,11 +15,28 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        bottom_navigation.setOnNavigationItemSelectedListener(this)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+            1
+        )
+        // 디테일 뷰 프레그먼트를 메인화면으로 세팅
+        bottom_navigation.selectedItemId = R.id.home_menu
+
+        // FCM pushToken 세팅
+        registerPushToken()
+    }
+
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
         setToolbarDefault()
         when (p0.itemId) {
@@ -77,17 +94,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         toolbar_title_image.visibility = View.VISIBLE
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        bottom_navigation.setOnNavigationItemSelectedListener(this)
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
-            1
-        )
-        // 디테일 뷰 프레그먼트를 메인화면으로 세팅
-        bottom_navigation.selectedItemId = R.id.home_menu
+    // FCM Token 설정
+    fun registerPushToken(){
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            val token = task.result?.token
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            val map = mutableMapOf<String, Any>()
+            map["pushToken"] = token!!
+
+            FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
+        }
     }
 
     // 엑티비티 실행 후 결과
