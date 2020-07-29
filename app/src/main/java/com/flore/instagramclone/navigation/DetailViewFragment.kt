@@ -13,6 +13,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.R
 import com.flore.instagramclone.navigation.model.AlarmDTO
 import com.flore.instagramclone.navigation.model.ContentDTO
+import com.flore.instagramclone.navigation.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_detail.view.*
@@ -158,6 +159,9 @@ class DetailViewFragment : Fragment() {
             alarmDTO.kind = 0
             alarmDTO.timestamp = System.currentTimeMillis()
             FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
+            var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
+            FcmPush.instance.sendMessage(destinationUid!!, "InstagramClone", message)
 
         }
     }
