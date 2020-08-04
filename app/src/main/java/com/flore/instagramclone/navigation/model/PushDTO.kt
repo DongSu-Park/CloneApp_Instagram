@@ -1,7 +1,5 @@
 package com.flore.instagramclone.navigation.model
 
-import android.app.Notification
-
 data class PushDTO(
     var to : String? = null,
     var notification : Notification = Notification()

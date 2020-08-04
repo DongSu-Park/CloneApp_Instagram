@@ -1,12 +1,14 @@
 package com.flore.instagramclone
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,9 +28,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
+
+        // 퍼미션 권한 요청 (스토리지 권한, 사진 촬영 권한)
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+            arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
             1
         )
         // 디테일 뷰 프레그먼트를 메인화면으로 세팅
@@ -58,9 +66,38 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 if (ContextCompat.checkSelfPermission(
                         this,
                         android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                     ) == PackageManager.PERMISSION_GRANTED
-                ) { // 권한 흭득 성공 시
-                    startActivity(Intent(this, AddPhotoActivity::class.java))
+                ) { // 권한 흭득 성공 다이얼로그 화면 나타내기 (수정 필요)
+                    var pictureArray = arrayOf("사진 촬영", "사진 선택")
+                    val alertDialog = AlertDialog.Builder(this)
+                        .setItems(pictureArray, DialogInterface.OnClickListener { dialog, which ->
+                            when (which) {
+                                0 -> {
+                                    startActivity(
+                                        Intent(
+                                            this,
+                                            AddPhotoActivity::class.java
+                                        ).apply { putExtra("menuSelect", "camera") })
+                                }
+
+                                1 -> {
+                                    startActivity(
+                                        Intent(
+                                            this,
+                                            AddPhotoActivity::class.java
+                                        ).apply { putExtra("menuSelect", "gallery") })
+                                }
+                            }
+                        })
+                    alertDialog.create()
+                    alertDialog.show()
+
                 } else {
                     Toast.makeText(this, "Please check the Permission!", Toast.LENGTH_LONG).show()
                 }
@@ -96,7 +133,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     // FCM Token 설정
-    fun registerPushToken(){
+    fun registerPushToken() {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
             val token = task.result?.token
             val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -111,10 +148,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK){
+        if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
             var imageUri = data?.data
             var uid = FirebaseAuth.getInstance().currentUser?.uid
-            var storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
+            var storageRef =
+                FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
 
             // FireStorage 이미지 저장
             storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
@@ -122,7 +160,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }.addOnSuccessListener { uri ->
                 var map = HashMap<String, Any>()
                 map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map) // FireStore(DB) 쿼리 저장
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid)
+                    .set(map) // FireStore(DB) 쿼리 저장
             }
         }
     }

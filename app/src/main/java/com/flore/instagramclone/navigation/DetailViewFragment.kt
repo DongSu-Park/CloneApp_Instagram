@@ -23,11 +23,7 @@ import kotlinx.android.synthetic.main.item_detail.view.*
 class DetailViewFragment : Fragment() {
     var firestore: FirebaseFirestore? = null // DB 내용에 담긴 데이터를 가져오기 위해 사용
     var uid: String? = null
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid // 유저 ID
