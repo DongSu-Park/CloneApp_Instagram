@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -24,6 +25,9 @@ import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
+    var captureUri: Uri? = null
+    var imageUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -149,7 +153,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
-            var imageUri = data?.data
+            imageUri = data?.data
+            var uid = FirebaseAuth.getInstance().currentUser?.uid
+            var storageRef =
+                FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
+
+            // FireStorage 이미지 저장
+            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+                return@continueWithTask storageRef.downloadUrl
+            }.addOnSuccessListener { uri ->
+                var map = HashMap<String, Any>()
+                map["image"] = uri.toString()
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid)
+                    .set(map) // FireStore(DB) 쿼리 저장
+            }
+        } else if (requestCode == UserFragment.PICK_IMAGE_FROM_CAMERA && resultCode == Activity.RESULT_OK) {
+            imageUri = captureUri
             var uid = FirebaseAuth.getInstance().currentUser?.uid
             var storageRef =
                 FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
