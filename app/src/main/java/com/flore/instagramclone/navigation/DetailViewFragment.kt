@@ -16,6 +16,7 @@ import com.flore.instagramclone.navigation.model.ContentDTO
 import com.flore.instagramclone.navigation.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import kotlinx.android.synthetic.main.item_comment.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
@@ -38,7 +39,7 @@ class DetailViewFragment : Fragment() {
         var contentUidList: ArrayList<String> = arrayListOf() // Uid 내용 리스트
 
         init { // 생성자
-            firestore?.collection("images")?.orderBy("timestamp")
+            firestore?.collection("images")?.orderBy("timestamp", Query.Direction.DESCENDING)
                 ?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear() // 리스트 초기화
                     contentUidList.clear() // 리스트 초기화
@@ -158,7 +159,6 @@ class DetailViewFragment : Fragment() {
 
             var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
             FcmPush.instance.sendMessage(destinationUid!!, "InstagramClone", message)
-
         }
     }
 }
