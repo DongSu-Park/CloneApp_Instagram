@@ -45,6 +45,7 @@
     <string name="hint_image_content">Image description</string>
     <string name="upload_success">Upload success</string>
     <string name="upload_fail">Upload fail</string>
+    <string name="upload_loading">Please Wait…</string>
 
     <!-- Toolbar -->
     <string name="back">Back</string>

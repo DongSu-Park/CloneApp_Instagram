@@ -26,8 +26,8 @@
 
     <ImageView
         android:id="@+id/addphoto_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         android:layout_below="@id/toolbar_division"
         android:layout_margin="8dp" />
 
@@ -35,8 +35,7 @@
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_division"
-        android:layout_toRightOf="@id/addphoto_image">
+        android:layout_below="@id/addphoto_image">
 
         <EditText
             android:id="@+id/addphoto_edit_explain"
@@ -51,7 +50,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editText"
-        android:layout_toRightOf="@+id/addphoto_image"
         android:text="@string/upload_image"
         android:theme="@style/ButtonStyle" />
 
