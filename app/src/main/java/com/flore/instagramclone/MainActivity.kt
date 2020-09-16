@@ -3,18 +3,14 @@ package com.flore.instagramclone
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.flore.instagramclone.navigation.*
-import com.flore.instagramclone.navigation.util.FcmPush
+import com.flore.instagramclone.navigation.util.PermissionCheck
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -22,27 +18,25 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     var captureUri: Uri? = null
     var imageUri: Uri? = null
+    val userP = PermissionCheck(this)
+    val permissionStrings = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
 
-        // 퍼미션 권한 요청 (스토리지 권한, 사진 촬영 권한)
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                android.Manifest.permission.CAMERA,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),
-            1
-        )
+        // 권한 체크
+        userP.grantPer()
+
         // 디테일 뷰 프레그먼트를 메인화면으로 세팅
         bottom_navigation.selectedItemId = R.id.home_menu
 
@@ -67,62 +61,51 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
 
             R.id.add_photo_menu -> {
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                        this,
-                        android.Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                        this,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) { // 권한 흭득 성공 다이얼로그 화면 나타내기 (수정 필요)
                     var pictureArray = arrayOf("사진 촬영", "사진 선택")
                     val alertDialog = AlertDialog.Builder(this)
                         .setItems(pictureArray, DialogInterface.OnClickListener { dialog, which ->
                             when (which) {
                                 0 -> {
-                                    startActivity(
-                                        Intent(
-                                            this,
-                                            AddPhotoActivity::class.java
-                                        ).apply { putExtra("menuSelect", "camera") })
+                                    if (TedPermission.isGranted(this, *permissionStrings)){
+                                        startActivity(Intent(this, AddPhotoActivity::class.java).apply
+                                        { putExtra("menuSelect", "camera") })
+                                    } else{
+                                        userP.grantPer()
+                                    }
                                 }
 
                                 1 -> {
-                                    startActivity(
-                                        Intent(
-                                            this,
-                                            AddPhotoActivity::class.java
-                                        ).apply { putExtra("menuSelect", "gallery") })
+                                    if (TedPermission.isGranted(this, *permissionStrings)){
+                                        startActivity(Intent(this, AddPhotoActivity::class.java).apply
+                                        { putExtra("menuSelect", "gallery") })
+                                    } else{
+                                        userP.grantPer()
+                                    }
                                 }
                             }
                         })
-                    alertDialog.create()
-                    alertDialog.show()
-
-                } else {
-                    Toast.makeText(this, "Please check the Permission!", Toast.LENGTH_LONG).show()
-                }
+                alertDialog.create()
+                alertDialog.show()
                 return true
             }
 
             R.id.favorite_alarm_menu -> {
                 var alarmFragment = AlarmFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.content_main, alarmFragment)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content_main, alarmFragment)
                     .commit()
                 return true
             }
 
             R.id.account_menu -> {
-                var userFragment = UserFragment()
-                var bundle = Bundle()
-                var uid = FirebaseAuth.getInstance().currentUser?.uid
+                val userFragment = UserFragment()
+                val bundle = Bundle()
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
                 bundle.putString("destinationUid", uid)
                 userFragment.arguments = bundle
 
-                supportFragmentManager.beginTransaction().replace(R.id.content_main, userFragment)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content_main, userFragment)
                     .commit()
                 return true
             }
@@ -184,4 +167,5 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         }
     }
+
 }

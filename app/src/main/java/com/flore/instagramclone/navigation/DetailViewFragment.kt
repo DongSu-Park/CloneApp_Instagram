@@ -18,14 +18,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.fragment_detail.view.*
-import kotlinx.android.synthetic.main.item_comment.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
 
 class DetailViewFragment : Fragment() {
     var firestore: FirebaseFirestore? = null // DB 내용에 담긴 데이터를 가져오기 위해 사용
     var uid: String? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
+        val view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid // 유저 ID
 
@@ -47,8 +47,8 @@ class DetailViewFragment : Fragment() {
                         return@addSnapshotListener
                     }
 
-                    for (snapshot in querySnapshot!!.documents) {
-                        var item = snapshot.toObject(ContentDTO::class.java)
+                    for (snapshot in querySnapshot.documents) {
+                        val item = snapshot.toObject(ContentDTO::class.java)
                         contentDTOs.add(item!!) // 이미지 컨텐츠 내용 추가
                         contentUidList.add(snapshot.id) // Uid 내용 추가
                     }
@@ -58,7 +58,7 @@ class DetailViewFragment : Fragment() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var view =
+            val view =
                 LayoutInflater.from(parent.context).inflate(R.layout.item_detail, parent, false)
             return CustomViewHolder(view)
         }
@@ -70,7 +70,7 @@ class DetailViewFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var viewHolder = (holder as CustomViewHolder).itemView
+            val viewHolder = (holder as CustomViewHolder).itemView
             // 유저 id
             viewHolder.detailviewitem_profile_textview.text = contentDTOs!![position].userId
 
@@ -103,7 +103,7 @@ class DetailViewFragment : Fragment() {
             }
 
             // 좋아요 버튼 클릭 후 이미지 변경
-            if (contentDTOs!![position].favorites.containsKey(uid)) {
+            if (contentDTOs[position].favorites.containsKey(uid)) {
                 viewHolder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
             } else {
                 viewHolder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
@@ -111,8 +111,8 @@ class DetailViewFragment : Fragment() {
 
             // 이미지 클릭 이벤트
             viewHolder.detailviewitem_profile_image.setOnClickListener {
-                var fragment = UserFragment()
-                var bundle = Bundle()
+                val fragment = UserFragment()
+                val bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[position].uid)
                 bundle.putString("userId", contentDTOs[position].userId)
                 fragment.arguments = bundle
@@ -122,7 +122,7 @@ class DetailViewFragment : Fragment() {
 
             // 댓글 클릭 이벤트
             viewHolder.detailviewitem_comment_imageview.setOnClickListener { v ->
-                var intent = Intent(v.context, CommentActivity::class.java)
+                val intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
                 intent.putExtra("destinationUid",contentDTOs[position].uid)
                 startActivity(intent)
@@ -130,10 +130,10 @@ class DetailViewFragment : Fragment() {
         }
 
         fun favoriteEvent(position: Int) { // 좋아요 표시 이벤트
-            var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
+            val tsDoc = firestore?.collection("images")?.document(contentUidList[position])
             firestore?.runTransaction { transaction ->
 
-                var contentDTO = transaction.get(tsDoc!!)
+                val contentDTO = transaction.get(tsDoc!!)
                     .toObject(ContentDTO::class.java) // 파이어베이스에 있는 content 데이터를 ContentDTO로 케스팅
 
                 if (contentDTO!!.favorites.containsKey(uid)) { // 좋아요 버튼이 이미 클릭 되어 있을 경우
@@ -149,7 +149,7 @@ class DetailViewFragment : Fragment() {
         }
 
         fun favoriteAlarm(destinationUid : String?){
-            var alarmDTO = AlarmDTO()
+            val alarmDTO = AlarmDTO()
             alarmDTO.destinationUid = destinationUid
             alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
             alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid

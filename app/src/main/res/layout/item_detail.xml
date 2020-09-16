@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/detailview_user_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center_vertical">
@@ -14,38 +16,53 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_margin="7.5dp"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/detailviewitem_profile_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User_name" />
-    </LinearLayout>
+            android:layout_marginLeft="10dp"
+            android:text="User_name"
+            app:layout_constraintTop_toTopOf="@id/detailviewitem_profile_image"
+            app:layout_constraintBottom_toBottomOf="@id/detailviewitem_profile_image"
+            app:layout_constraintStart_toEndOf="@id/detailviewitem_profile_image"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/detailviewitem_imageview_content"
         android:layout_width="match_parent"
         android:layout_height="250dp" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginLeft="8dp"
-        android:gravity="center_vertical">
+        android:layout_marginLeft="8dp">
 
         <ImageView
             android:id="@+id/detailviewitem_favorite_imageview"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/ic_favorite_border" />
+            android:src="@drawable/ic_favorite_border"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/detailviewitem_comment_imageview"/>
 
         <ImageView
             android:id="@+id/detailviewitem_comment_imageview"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:src="@drawable/ic_chat_black" />
-    </LinearLayout>
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_chat_black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/detailviewitem_favorite_imageview"
+            app:layout_constraintTop_toTopOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/detailviewitem_favoritecounter_textview"

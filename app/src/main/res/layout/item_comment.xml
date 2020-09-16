@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="50dp">
+    
     <ImageView
         android:id="@+id/iv_commentviewitem_profile"
         android:layout_margin="7.5dp"
         android:layout_width="35dp"
-        android:layout_height="35dp"/>
+        android:layout_height="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tv_commentviewitem_profile"/>
 
     <TextView
         android:id="@+id/tv_commentviewitem_profile"
-        android:layout_margin="7.5dp"
+        android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:text="UserID"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/iv_commentviewitem_profile"
+        app:layout_constraintBottom_toBottomOf="@id/iv_commentviewitem_profile"
+        app:layout_constraintStart_toEndOf="@id/iv_commentviewitem_profile" />
 
     <TextView
         android:id="@+id/tv_commentviewitem_comment"
-        android:layout_margin="7.5dp"
+        android:layout_marginLeft="10dp"
         android:text="Message"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/tv_commentviewitem_profile"
+        app:layout_constraintBottom_toBottomOf="@id/tv_commentviewitem_profile"
+        app:layout_constraintStart_toEndOf="@id/tv_commentviewitem_profile"/>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

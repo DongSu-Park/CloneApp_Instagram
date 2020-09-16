@@ -27,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
     var googleSignInClient: GoogleSignInClient? = null // 구글 계정 Auth
     var GOOGLE_LOGIN_CODE = 9001
     var callbackManager: CallbackManager? = null // 페이스북 계정 Auth
+
     companion object {
         const val TAG = "LoginActivity"
     }
@@ -142,23 +143,19 @@ class LoginActivity : AppCompatActivity() {
             ).show()
             return
         } else {
-
-            auth?.createUserWithEmailAndPassword(
-                et_email.text.toString(),
-                et_password.text.toString()
-            )
+            auth?.createUserWithEmailAndPassword(et_email.text.toString(), et_password.text.toString())
                 ?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         // 계정이 생성 되었을 경우
                         intentMainPage(task.result?.user)
-                    } else if (!task.exception?.message.isNullOrEmpty()) {
+                    } else if (task.exception?.message.isNullOrEmpty()) {
                         // 로그인 에러가 나왔을 경우 에러 메세지 표시
                         Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                     } else {
                         signinEmail()
                     }
                 }
-        }
+            }
     }
 
     fun signinEmail() { // 기존 사용자인 경우 로그인을 함
