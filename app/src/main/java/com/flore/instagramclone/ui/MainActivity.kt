@@ -12,11 +12,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.flore.instagramclone.R
 import com.flore.instagramclone.navigation.*
 import com.flore.instagramclone.navigation.util.PermissionCheck
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.TedPermission
@@ -119,8 +122,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     // FCM Token 설정
     private fun registerPushToken() {
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-            val token = task.result?.token
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            val token = task.result
             val uid = FirebaseAuth.getInstance().currentUser?.uid
             val map = mutableMapOf<String, Any>()
             map["pushToken"] = token!!
