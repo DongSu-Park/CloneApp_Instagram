@@ -1,7 +1,9 @@
 package com.flore.instagramclone.navigation
 
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.R
 import com.flore.instagramclone.navigation.model.AlarmDTO
@@ -31,6 +34,7 @@ class DetailViewFragment : Fragment() {
 
         view.detailviewfragment_recycleview.adapter = DetailViewRecyclerViewAdapter()
         view.detailviewfragment_recycleview.layoutManager = LinearLayoutManager(activity)
+
         return view
     }
 
@@ -71,11 +75,15 @@ class DetailViewFragment : Fragment() {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val viewHolder = (holder as CustomViewHolder).itemView
+
+
             // 유저 id
             viewHolder.detailviewitem_profile_textview.text = contentDTOs!![position].userId
 
             // 이미지 로딩 (Glide)
-            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl)
+            Glide.with(holder.itemView.context)
+                .load(contentDTOs!![position].imageUrl)
+                .override(410, 250)
                 .into(viewHolder.detailviewitem_imageview_content)
 
             // 이미지 설명
@@ -93,7 +101,9 @@ class DetailViewFragment : Fragment() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful){
                         var url = task.result!!["image"]
-                        Glide.with(holder.itemView.context).load(url).apply(RequestOptions().circleCrop()).into(viewHolder.detailviewitem_profile_image)
+                        Glide.with(holder.itemView.context)
+                            .load(url)
+                            .apply(RequestOptions().circleCrop()).into(viewHolder.detailviewitem_profile_image)
                     }
                 }
 

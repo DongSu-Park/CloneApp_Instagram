@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -15,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -24,8 +22,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.flore.instagramclone.LoginActivity
-import com.flore.instagramclone.MainActivity
+import com.flore.instagramclone.ui.LoginActivity
+import com.flore.instagramclone.ui.MainActivity
 import com.flore.instagramclone.R
 import com.flore.instagramclone.navigation.model.AlarmDTO
 import com.flore.instagramclone.navigation.model.ContentDTO
@@ -54,18 +52,12 @@ class UserFragment : Fragment() {
         var PICK_IMAGE_FROM_CAMERA = 11
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        fragmentView =
-            LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
         uid = arguments?.getString("destinationUid") // 상대방 또는 자신의 uid 가져옴
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         currentUserUid = auth?.currentUser?.uid // 현재 로그인한 유저의 uid를 가져옴
-
 
         if (uid == currentUserUid) { // 자신의 uid와 가져온 uid 값이 일치하면 자신 페이지로 이동
             fragmentView?.btn_account_follow_signout?.text = getString(R.string.signout)
@@ -141,8 +133,7 @@ class UserFragment : Fragment() {
         return fragmentView // 프레그먼트 뷰 설정
     }
 
-    inner class UserFragmentRecyclerViewAdapter :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() { // 어댑터 설정
+    inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() { // 어댑터 설정
         var contentDTOs: ArrayList<ContentDTO> = arrayListOf()
 
         init {

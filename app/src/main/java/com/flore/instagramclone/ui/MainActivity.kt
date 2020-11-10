@@ -1,4 +1,4 @@
-package com.flore.instagramclone
+package com.flore.instagramclone.ui
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.flore.instagramclone.R
 import com.flore.instagramclone.navigation.*
 import com.flore.instagramclone.navigation.util.PermissionCheck
 import com.google.android.gms.tasks.Task
@@ -24,8 +25,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     var captureUri: Uri? = null
     var imageUri: Uri? = null
-    val userP = PermissionCheck(this)
-    val permissionStrings = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+    private val userP = PermissionCheck(this)
+    private val permissionStrings = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE,
         android.Manifest.permission.CAMERA,
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
@@ -59,7 +60,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     .commit()
                 return true
             }
-
             R.id.add_photo_menu -> {
                     var pictureArray = arrayOf("사진 촬영", "사진 선택")
                     val alertDialog = AlertDialog.Builder(this)
@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 alertDialog.show()
                 return true
             }
-
             R.id.favorite_alarm_menu -> {
                 var alarmFragment = AlarmFragment()
                 supportFragmentManager.beginTransaction()
@@ -96,7 +95,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     .commit()
                 return true
             }
-
             R.id.account_menu -> {
                 val userFragment = UserFragment()
                 val bundle = Bundle()
@@ -113,14 +111,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         return false
     }
 
-    fun setToolbarDefault() {
+    private fun setToolbarDefault() {
         toolbar_username.visibility = View.GONE
         btn_toolbar_back.visibility = View.GONE
         toolbar_title_image.visibility = View.VISIBLE
     }
 
     // FCM Token 설정
-    fun registerPushToken() {
+    private fun registerPushToken() {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
             val token = task.result?.token
             val uid = FirebaseAuth.getInstance().currentUser?.uid
