@@ -1,4 +1,4 @@
-package com.flore.instagramclone.navigation.util
+package com.flore.instagramclone.util
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -12,7 +12,6 @@ class UploadDialog {
     constructor(activity: Activity?) {
         this.activity = activity
     }
-
 
     fun startLoadingDialog(){
         val builder : AlertDialog.Builder? = AlertDialog.Builder(activity)

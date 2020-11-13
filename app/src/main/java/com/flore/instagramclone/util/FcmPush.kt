@@ -1,6 +1,6 @@
-package com.flore.instagramclone.navigation.util
+package com.flore.instagramclone.util
 
-import com.flore.instagramclone.navigation.model.PushDTO
+import com.flore.instagramclone.model.PushDTO
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import okhttp3.*

@@ -50,6 +50,9 @@
 
     <!-- Toolbar -->
     <string name="back">Back</string>
+    <string name="detail_UserName">User_name</string>
+    <string name="detail_LikeCount">like %s</string>
+    <string name="detail_content">Explain content</string>
 
     <!-- etc -->
     <item name="visible" type="id" />

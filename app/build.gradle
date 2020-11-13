@@ -70,7 +70,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
 
-    // Okhttp Library
+    // OkHttp Library
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.google.code.gson:gson:2.8.6'
 

@@ -1,4 +1,4 @@
-package com.flore.instagramclone.navigation.util
+package com.flore.instagramclone.util
 
 import android.content.Context
 import android.widget.Toast

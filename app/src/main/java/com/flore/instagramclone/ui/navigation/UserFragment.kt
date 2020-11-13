@@ -1,4 +1,4 @@
-package com.flore.instagramclone.navigation
+package com.flore.instagramclone.ui.navigation
 
 import android.app.AlertDialog
 import android.content.DialogInterface
@@ -25,10 +25,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.ui.LoginActivity
 import com.flore.instagramclone.ui.MainActivity
 import com.flore.instagramclone.R
-import com.flore.instagramclone.navigation.model.AlarmDTO
-import com.flore.instagramclone.navigation.model.ContentDTO
-import com.flore.instagramclone.navigation.model.FollowDTO
-import com.flore.instagramclone.navigation.util.FcmPush
+import com.flore.instagramclone.model.AlarmDTO
+import com.flore.instagramclone.model.ContentDTO
+import com.flore.instagramclone.model.FollowDTO
+import com.flore.instagramclone.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*

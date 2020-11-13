@@ -10,15 +10,12 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.flore.instagramclone.R
-import com.flore.instagramclone.navigation.*
-import com.flore.instagramclone.navigation.util.PermissionCheck
-import com.google.android.gms.tasks.OnCompleteListener
+import com.flore.instagramclone.ui.navigation.*
+import com.flore.instagramclone.util.PermissionCheck
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
@@ -50,21 +47,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
         setToolbarDefault()
+
         when (p0.itemId) {
             R.id.home_menu -> {
-                var detailViewFragment = DetailViewFragment()
+                val detailViewFragment = DetailViewFragment()
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.content_main, detailViewFragment).commit()
                 return true
             }
             R.id.search_menu -> {
-                var gridFragment = GridFragment()
+                val gridFragment = GridFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.content_main, gridFragment)
                     .commit()
                 return true
             }
             R.id.add_photo_menu -> {
-                    var pictureArray = arrayOf("사진 촬영", "사진 선택")
+                    val pictureArray = arrayOf("사진 촬영", "사진 선택")
                     val alertDialog = AlertDialog.Builder(this)
                         .setItems(pictureArray, DialogInterface.OnClickListener { dialog, which ->
                             when (which) {
@@ -87,12 +85,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                                 }
                             }
                         })
-                alertDialog.create()
-                alertDialog.show()
+                alertDialog.create().show()
                 return true
             }
             R.id.favorite_alarm_menu -> {
-                var alarmFragment = AlarmFragment()
+                val alarmFragment = AlarmFragment()
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.content_main, alarmFragment)
                     .commit()
@@ -138,8 +135,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
             imageUri = data?.data
-            var uid = FirebaseAuth.getInstance().currentUser?.uid
-            var storageRef =
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            val storageRef =
                 FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
 
             // FireStorage 이미지 저장
@@ -153,15 +150,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         } else if (requestCode == UserFragment.PICK_IMAGE_FROM_CAMERA && resultCode == Activity.RESULT_OK) {
             imageUri = captureUri
-            var uid = FirebaseAuth.getInstance().currentUser?.uid
-            var storageRef =
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            val storageRef =
                 FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
 
             // FireStorage 이미지 저장
             storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
                 return@continueWithTask storageRef.downloadUrl
             }.addOnSuccessListener { uri ->
-                var map = HashMap<String, Any>()
+                val map = HashMap<String, Any>()
                 map["image"] = uri.toString()
                 FirebaseFirestore.getInstance().collection("profileImages").document(uid)
                     .set(map) // FireStore(DB) 쿼리 저장

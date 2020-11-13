@@ -1,22 +1,22 @@
-package com.flore.instagramclone.navigation
+package com.flore.instagramclone.ui.navigation
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
-import android.media.Image
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.flore.instagramclone.R
-import com.flore.instagramclone.navigation.model.AlarmDTO
-import com.flore.instagramclone.navigation.model.ContentDTO
-import com.flore.instagramclone.navigation.util.FcmPush
+import com.flore.instagramclone.model.AlarmDTO
+import com.flore.instagramclone.model.ContentDTO
+import com.flore.instagramclone.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -27,7 +27,11 @@ class DetailViewFragment : Fragment() {
     var firestore: FirebaseFirestore? = null // DB 내용에 담긴 데이터를 가져오기 위해 사용
     var uid: String? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid // 유저 ID
@@ -39,12 +43,12 @@ class DetailViewFragment : Fragment() {
     }
 
     inner class DetailViewRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var contentDTOs: ArrayList<ContentDTO> = arrayListOf() // 컨텐츠 내용 리스트
-        var contentUidList: ArrayList<String> = arrayListOf() // Uid 내용 리스트
+        private var contentDTOs: ArrayList<ContentDTO> = arrayListOf() // 컨텐츠 내용 리스트
+        private var contentUidList: ArrayList<String> = arrayListOf() // Uid 내용 리스트
 
         init { // 생성자
             firestore?.collection("images")?.orderBy("timestamp", Query.Direction.DESCENDING)
-                ?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                ?.addSnapshotListener { querySnapshot, _ ->
                     contentDTOs.clear() // 리스트 초기화
                     contentUidList.clear() // 리스트 초기화
                     if (querySnapshot == null) { // 로그아웃된 경우 null이 발생하기 때문에 이에 대한 exception 처리
@@ -76,22 +80,51 @@ class DetailViewFragment : Fragment() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val viewHolder = (holder as CustomViewHolder).itemView
 
-
             // 유저 id
-            viewHolder.detailviewitem_profile_textview.text = contentDTOs!![position].userId
+            viewHolder.detailviewitem_profile_textview.text = contentDTOs[position].userId
+
+            // 유저 자신의 게시글 삭제 버튼 활성화 여부
+            if (uid == contentDTOs[position].uid) {
+                viewHolder.detailviewitem_delete_imageview.visibility = View.VISIBLE
+            } else {
+                viewHolder.detailviewitem_delete_imageview.visibility = View.GONE
+            }
+
+            // 삭제 버튼 클릭 (서버, 로컬 컬렉션 삭제)
+            viewHolder.detailviewitem_delete_imageview.setOnClickListener {
+                val alertDialog = AlertDialog.Builder(holder.itemView.context)
+                alertDialog.apply {
+                    setTitle("컨텐츠 삭제 확인")
+                    setMessage("해당 게시글을 삭제하겠습니까?")
+                    setPositiveButton("예") { _, _ ->
+                        // 해당 게시글 삭제
+                        // 서버 내역 삭제
+                        deleteContent(holder.itemView.context, contentDTOs[position].imageUrl)
+                        // 로컬 내역 삭제
+                        contentDTOs.removeAt(position)
+                        contentUidList.removeAt(position)
+                        notifyItemRemoved(position)
+                        notifyItemRangeChanged(position, contentDTOs.size)
+                    }
+                    setNegativeButton("아니오", null)
+                }.create().show()
+            }
+
+
 
             // 이미지 로딩 (Glide)
             Glide.with(holder.itemView.context)
-                .load(contentDTOs!![position].imageUrl)
+                .load(contentDTOs[position].imageUrl)
+                .error(R.drawable.ic_baseline_error_24)
                 .override(410, 250)
                 .into(viewHolder.detailviewitem_imageview_content)
 
             // 이미지 설명
-            viewHolder.detailviewitem_explain_textview.text = contentDTOs!![position].explain
+            viewHolder.detailviewitem_explain_textview.text = contentDTOs[position].explain
 
             // 좋아요 내용 표시
             viewHolder.detailviewitem_favoritecounter_textview.text =
-                "Likes " + contentDTOs!![position].favoriteCount
+                "Likes : ${contentDTOs[position].favoriteCount}"
 
             // 유저 프로필 이미지 로딩 (Glide)
             FirebaseFirestore.getInstance()
@@ -99,11 +132,12 @@ class DetailViewFragment : Fragment() {
                 .document(contentDTOs[position].uid!!)
                 .get()
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful){
-                        var url = task.result!!["image"]
+                    if (task.isSuccessful) {
+                        val url = task.result!!["image"]
                         Glide.with(holder.itemView.context)
                             .load(url)
-                            .apply(RequestOptions().circleCrop()).into(viewHolder.detailviewitem_profile_image)
+                            .apply(RequestOptions().circleCrop())
+                            .into(viewHolder.detailviewitem_profile_image)
                     }
                 }
 
@@ -134,12 +168,27 @@ class DetailViewFragment : Fragment() {
             viewHolder.detailviewitem_comment_imageview.setOnClickListener { v ->
                 val intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
-                intent.putExtra("destinationUid",contentDTOs[position].uid)
+                intent.putExtra("destinationUid", contentDTOs[position].uid)
                 startActivity(intent)
             }
         }
 
-        fun favoriteEvent(position: Int) { // 좋아요 표시 이벤트
+        private fun deleteContent(context: Context, imageUrl: String?) {
+            firestore!!.collection("images").whereEqualTo("imageUrl", imageUrl).get()
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        // 원격저장소 삭제
+                        firestore!!.collection("images").document(it.result.documents[0].id)
+                            .delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "해당 게시글은 삭제되었습니다.", Toast.LENGTH_LONG)
+                                    .show()
+                            }
+                    }
+                }
+        }
+
+        private fun favoriteEvent(position: Int) { // 좋아요 표시 이벤트
             val tsDoc = firestore?.collection("images")?.document(contentUidList[position])
             firestore?.runTransaction { transaction ->
 
@@ -147,10 +196,10 @@ class DetailViewFragment : Fragment() {
                     .toObject(ContentDTO::class.java) // 파이어베이스에 있는 content 데이터를 ContentDTO로 케스팅
 
                 if (contentDTO!!.favorites.containsKey(uid)) { // 좋아요 버튼이 이미 클릭 되어 있을 경우
-                    contentDTO?.favoriteCount = contentDTO?.favoriteCount!! - 1
-                    contentDTO?.favorites.remove(uid) // uid 값 삭제
+                    contentDTO.favoriteCount = contentDTO.favoriteCount!! - 1
+                    contentDTO.favorites.remove(uid) // uid 값 삭제
                 } else {
-                    contentDTO?.favoriteCount = contentDTO?.favoriteCount!! + 1
+                    contentDTO.favoriteCount = contentDTO.favoriteCount!! + 1
                     contentDTO.favorites[uid!!] = true // uid 값 hashMap에 리스트로 저장
                     favoriteAlarm(contentDTOs[position].uid!!)
                 }
@@ -158,7 +207,7 @@ class DetailViewFragment : Fragment() {
             }
         }
 
-        fun favoriteAlarm(destinationUid : String?){
+        private fun favoriteAlarm(destinationUid: String?) {
             val alarmDTO = AlarmDTO()
             alarmDTO.destinationUid = destinationUid
             alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
@@ -167,7 +216,8 @@ class DetailViewFragment : Fragment() {
             alarmDTO.timestamp = System.currentTimeMillis()
             FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
 
-            var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
+            val message =
+                FirebaseAuth.getInstance().currentUser?.email + getString(R.string.alarm_favorite)
             FcmPush.instance.sendMessage(destinationUid!!, "InstagramClone", message)
         }
     }

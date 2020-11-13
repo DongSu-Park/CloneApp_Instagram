@@ -1,18 +1,17 @@
-package com.flore.instagramclone.navigation
+package com.flore.instagramclone.ui.navigation
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.flore.instagramclone.R
-import com.flore.instagramclone.navigation.model.ContentDTO
-import com.flore.instagramclone.navigation.util.UploadDialog
+import com.flore.instagramclone.model.ContentDTO
+import com.flore.instagramclone.util.UploadDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -21,7 +20,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.jar.Manifest
 
 class AddPhotoActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0 // 사진 앨범 엑티비티 리퀘스트
@@ -109,7 +107,6 @@ class AddPhotoActivity : AppCompatActivity() {
         uploadDialog.startLoadingDialog()
 
         // 업로드 이벤트 (Store에 업로드하고 해당 주소를 가져옴, 콜백 형식)
-
         storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
             storageRef.downloadUrl.addOnSuccessListener { uri ->
                 var contentDTO = ContentDTO()

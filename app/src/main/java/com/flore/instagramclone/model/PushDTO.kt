@@ -1,4 +1,4 @@
-package com.flore.instagramclone.navigation.model
+package com.flore.instagramclone.model
 
 data class PushDTO(
     var to : String? = null,

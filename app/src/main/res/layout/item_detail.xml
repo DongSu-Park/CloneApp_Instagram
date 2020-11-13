@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,8 +26,8 @@
             android:id="@+id/detailviewitem_profile_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="User_name"
+            android:layout_marginStart="10dp"
+            android:text="@string/detail_UserName"
             app:layout_constraintTop_toTopOf="@id/detailviewitem_profile_image"
             app:layout_constraintBottom_toBottomOf="@id/detailviewitem_profile_image"
             app:layout_constraintStart_toEndOf="@id/detailviewitem_profile_image"/>
@@ -42,7 +43,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginLeft="8dp">
+        android:layout_marginStart="8dp">
 
         <ImageView
             android:id="@+id/detailviewitem_favorite_imageview"
@@ -58,19 +59,30 @@
             android:id="@+id/detailviewitem_comment_imageview"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_chat_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/detailviewitem_favorite_imageview"
             app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/detailviewitem_delete_imageview"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_baseline_delete_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/detailviewitem_favoritecounter_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:text="like 0" />
+        android:layout_marginStart="8dp"
+        android:text="@string/detail_LikeCount" />
 
     <TextView
         android:id="@+id/detailviewitem_explain_textview"
@@ -79,7 +91,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Explain content" />
+        android:text="@string/detail_content" />
 
     <LinearLayout
         android:id="@+id/detailviewitem_division"
