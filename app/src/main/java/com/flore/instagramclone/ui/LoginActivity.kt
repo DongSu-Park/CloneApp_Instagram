@@ -22,14 +22,12 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.flore.instagramclone.R
 import com.flore.instagramclone.databinding.ActivityLoginBinding
-import java.security.MessageDigest
-import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private val viewModelLogin: LoginViewModel by viewModels()
 
     var auth: FirebaseAuth? = null // 파이어베이스 Auth
-    var callbackManager: CallbackManager? = null // 페이스북 계정 Auth
+    private var callbackManager: CallbackManager? = null // 페이스북 계정 Auth
 
     companion object {
         const val TAG = "LoginActivity"
@@ -84,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
                     LoginManager.getInstance()
                         .logInWithReadPermissions(
                             this@LoginActivity,
-                            Arrays.asList("public_profile", "email")
+                            listOf("public_profile", "email")
                         )
 
                     LoginManager.getInstance()
@@ -131,23 +129,6 @@ class LoginActivity : AppCompatActivity() {
                     showToastBlankAuth.value = false
                 }
             })
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.P)
-    private fun createKeyHash() {
-        try {
-            val packageInfo =
-                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
-            val signatures = packageInfo.signingInfo.apkContentsSigners
-            for (signature in signatures) {
-                val md: MessageDigest = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                val key = String(Base64.encode(md.digest(), 0))
-                Log.d("hashKey", key)
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
         }
     }
 
