@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.flore.instagramclone.ui.navigation.CommentActivity"/>
-        <activity android:name="com.flore.instagramclone.ui.navigation.AddPhotoActivity" />
+        <activity android:name="com.flore.instagramclone.ui.navigation.AddPhotoActivity"/>
+        <activity android:name="com.flore.instagramclone.ui.navigation.OthersUserActivity"/>
         <activity android:name=".ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

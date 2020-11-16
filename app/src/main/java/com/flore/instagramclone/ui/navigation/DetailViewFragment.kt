@@ -110,8 +110,6 @@ class DetailViewFragment : Fragment() {
                 }.create().show()
             }
 
-
-
             // 이미지 로딩 (Glide)
             Glide.with(holder.itemView.context)
                 .load(contentDTOs[position].imageUrl)
@@ -155,13 +153,24 @@ class DetailViewFragment : Fragment() {
 
             // 이미지 클릭 이벤트
             viewHolder.detailviewitem_profile_image.setOnClickListener {
-                val fragment = UserFragment()
-                val bundle = Bundle()
-                bundle.putString("destinationUid", contentDTOs[position].uid)
-                bundle.putString("userId", contentDTOs[position].userId)
-                fragment.arguments = bundle
-                activity?.supportFragmentManager?.beginTransaction()
-                    ?.replace(R.id.content_main, fragment)?.commit() // 프레그먼트를 UserFragment로 변경
+                // uid는 자기 자신, contentDTOs에 있는 uid는 자기자신 또는 타인
+                if (uid == contentDTOs[position].uid){
+                    // 자신의 uid의 경우 자신의 유저 상세 프레그먼트로 이동
+                    val fragment = UserFragment()
+                    val bundle = Bundle()
+                    bundle.putString("myUid", contentDTOs[position].uid)
+                    bundle.putString("myUserId", contentDTOs[position].userId)
+                    fragment.arguments = bundle
+                    activity?.supportFragmentManager?.beginTransaction()
+                        ?.replace(R.id.content_main, fragment)?.commit()
+                } else{
+                    // 타인의 uid의 경우 타인의 유저 상세 엑티비티로 이동 (테스트 필요)
+                    val intent = Intent(activity, OthersUserActivity::class.java)
+                    intent.putExtra("myUid", uid)
+                    intent.putExtra("otherUid", contentDTOs[position].uid)
+                    intent.putExtra("otherUserId", contentDTOs[position].userId)
+                    startActivity(intent)
+                }
             }
 
             // 댓글 클릭 이벤트

@@ -34,9 +34,9 @@
     <string name="count_0">0</string>
 
     <!-- Alarm -->
-    <string name="alarm_favorite">Liked the press</string>
-    <string name="alarm_comment">left a message</string>
-    <string name="alarm_follow">has started to follow your account</string>
+    <string name="alarm_favorite">가 당신의 포스트에 좋아요를 눌렀습니다.</string>
+    <string name="alarm_comment">가 당신의 포스트에 메세지를 남겼습니다.</string>
+    <string name="alarm_follow">가 팔로우를 하였습니다.</string>
 
     <!-- Comment -->
     <string name="send">Send</string>
@@ -53,6 +53,7 @@
     <string name="detail_UserName">User_name</string>
     <string name="detail_LikeCount">like %s</string>
     <string name="detail_content">Explain content</string>
+    <string name="btn_setting">Setting</string>
 
     <!-- etc -->
     <item name="visible" type="id" />

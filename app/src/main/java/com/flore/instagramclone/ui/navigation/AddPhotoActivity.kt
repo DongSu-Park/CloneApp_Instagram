@@ -97,19 +97,19 @@ class AddPhotoActivity : AppCompatActivity() {
 
     private fun contentUpload() {
         // 업로드할 이미지의 메타 태그 작성
-        var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        var imageFileName = "Image_" + timestamp + "_.png" // ex. Image_20200720_162710_.png
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "Image_" + timestamp + "_.png" // ex. Image_20200720_162710_.png
 
-        var storageRef =
+        val storageRef =
             storage?.reference?.child("images")?.child(imageFileName) // 파이어베이스 클라우드 스토리지 저장 경로
 
-        var uploadDialog = UploadDialog(this)
+        val uploadDialog = UploadDialog(this)
         uploadDialog.startLoadingDialog()
 
         // 업로드 이벤트 (Store에 업로드하고 해당 주소를 가져옴, 콜백 형식)
         storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                var contentDTO = ContentDTO()
+                val contentDTO = ContentDTO()
 
                 contentDTO.imageUrl = uri.toString()
                 contentDTO.uid = auth?.currentUser?.uid
@@ -117,7 +117,7 @@ class AddPhotoActivity : AppCompatActivity() {
                 contentDTO.explain = addphoto_edit_explain.text.toString()
                 contentDTO.timestamp = System.currentTimeMillis()
 
-                var firestoreUpload = firestore?.collection("images")?.document()?.set(contentDTO)
+                val firestoreUpload = firestore?.collection("images")?.document()?.set(contentDTO)
 
                 if (firestoreUpload != null) {
                     uploadDialog.dismissDialog()

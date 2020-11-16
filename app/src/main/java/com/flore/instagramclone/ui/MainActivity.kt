@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.flore.instagramclone.R
 import com.flore.instagramclone.ui.navigation.*
 import com.flore.instagramclone.util.PermissionCheck
+import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
+import java.net.URI
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     var captureUri: Uri? = null
@@ -43,6 +45,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         // FCM pushToken 세팅
         registerPushToken()
+
+        // 상단 툴바 세팅
     }
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
@@ -50,14 +54,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         when (p0.itemId) {
             R.id.home_menu -> {
-                val detailViewFragment = DetailViewFragment()
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_main, detailViewFragment).commit()
+                    .replace(R.id.content_main, DetailViewFragment()).commit()
                 return true
             }
             R.id.search_menu -> {
-                val gridFragment = GridFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.content_main, gridFragment)
+                supportFragmentManager.beginTransaction().replace(R.id.content_main, GridFragment())
                     .commit()
                 return true
             }
@@ -89,17 +91,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 return true
             }
             R.id.favorite_alarm_menu -> {
-                val alarmFragment = AlarmFragment()
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_main, alarmFragment)
+                    .replace(R.id.content_main, AlarmFragment())
                     .commit()
                 return true
             }
+
             R.id.account_menu -> {
                 val userFragment = UserFragment()
                 val bundle = Bundle()
                 val uid = FirebaseAuth.getInstance().currentUser?.uid
-                bundle.putString("destinationUid", uid)
+                bundle.putString("myUid", uid)
                 userFragment.arguments = bundle
 
                 supportFragmentManager.beginTransaction()
@@ -129,39 +131,41 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
-    // 엑티비티 실행 후 결과
+    // 엑티비티 실행 후 결과 (자기 자신 프로필 이미지 변경에 의한 onActivityResult)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        val uid = FirebaseAuth.getInstance().currentUser?.uid // 어짜피 자기 자신
+        val storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
+
         if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK) {
             imageUri = data?.data
-            val uid = FirebaseAuth.getInstance().currentUser?.uid
-            val storageRef =
-                FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
-
             // FireStorage 이미지 저장
             storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
-                return@continueWithTask storageRef.downloadUrl
-            }.addOnSuccessListener { uri ->
-                var map = HashMap<String, Any>()
-                map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profileImages").document(uid)
-                    .set(map) // FireStore(DB) 쿼리 저장
-            }
-        } else if (requestCode == UserFragment.PICK_IMAGE_FROM_CAMERA && resultCode == Activity.RESULT_OK) {
-            imageUri = captureUri
-            val uid = FirebaseAuth.getInstance().currentUser?.uid
-            val storageRef =
-                FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
-
-            // FireStorage 이미지 저장
-            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+                // 오류 예외 처리
+                if (!task.isSuccessful){
+                    throw task.exception!!
+                }
+                // 업로드 후 결과 url 리턴
                 return@continueWithTask storageRef.downloadUrl
             }.addOnSuccessListener { uri ->
                 val map = HashMap<String, Any>()
                 map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profileImages").document(uid)
-                    .set(map) // FireStore(DB) 쿼리 저장
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
+            }
+
+        } else if (requestCode == UserFragment.PICK_IMAGE_FROM_CAMERA && resultCode == Activity.RESULT_OK) {
+            imageUri = captureUri
+            // FireStorage 이미지 저장
+            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+                if (!task.isSuccessful){
+                    throw task.exception!!
+                }
+                return@continueWithTask storageRef.downloadUrl
+            }.addOnSuccessListener { uri ->
+                val map = HashMap<String, Any>()
+                map["image"] = uri.toString()
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
             }
         }
     }
