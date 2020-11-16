@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.flore.instagramclone.R
 import com.flore.instagramclone.ui.navigation.*
 import com.flore.instagramclone.util.PermissionCheck
-import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +21,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
-import java.net.URI
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     var captureUri: Uri? = null
@@ -45,8 +43,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         // FCM pushToken 세팅
         registerPushToken()
-
-        // 상단 툴바 세팅
     }
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
@@ -114,8 +110,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private fun setToolbarDefault() {
-        toolbar_username.visibility = View.GONE
-        btn_toolbar_back.visibility = View.GONE
         toolbar_title_image.visibility = View.VISIBLE
     }
 

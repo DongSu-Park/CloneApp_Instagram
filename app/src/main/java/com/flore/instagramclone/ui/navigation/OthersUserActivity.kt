@@ -216,29 +216,29 @@ class OthersUserActivity : AppCompatActivity() {
                 // 팔로우 카운터 가져오기
                 if (followDTO?.followerCount != null) {
                     tv_others_follower_count.text = followDTO.followerCount.toString()
+                }
 
-                    // 팔로우 상태인지 아닌지에 따라 팔로우 버튼의 글자 및 색상이 달라짐
-                    if (followDTO.followers.containsKey(myUid)) {
-                        // 팔로우 되어 있는 상태일 경우
-                        btn_others_follow_signout.text = getString(R.string.follow_cancel)
+                // 팔로우 상태인지 아닌지에 따라 팔로우 버튼의 글자 및 색상이 달라짐
+                if (followDTO!!.followers.containsKey(myUid)) {
+                    // 팔로우 되어 있는 상태일 경우
+                    btn_others_follow_signout.text = getString(R.string.follow_cancel)
 
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                            btn_others_follow_signout.background.colorFilter =
-//                                BlendModeColorFilter(
-//                                    ContextCompat.getColor(this, R.color.colorLightGray),
-//                                    BlendMode.MULTIPLY
-//                                )
-//                        } else {
-//                            @Suppress("DEPRECATION")
-//                            btn_others_follow_signout.background.setColorFilter(
-//                                ContextCompat.getColor(this, R.color.colorLightGray),
-//                                PorterDuff.Mode.MULTIPLY
-//                            )
-//                        }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        btn_others_follow_signout.background.colorFilter =
+                            BlendModeColorFilter(
+                                ContextCompat.getColor(this, R.color.colorLightGray),
+                                BlendMode.MULTIPLY
+                            )
                     } else {
-                        btn_others_follow_signout.text = getString(R.string.follow)
-//                        btn_others_follow_signout.background.colorFilter = null
+                        @Suppress("DEPRECATION")
+                        btn_others_follow_signout.background.setColorFilter(
+                            ContextCompat.getColor(this, R.color.colorLightGray),
+                            PorterDuff.Mode.MULTIPLY
+                        )
                     }
+                } else {
+                    btn_others_follow_signout.text = getString(R.string.follow)
+                    btn_others_follow_signout.background.colorFilter = null
                 }
             }
     }
