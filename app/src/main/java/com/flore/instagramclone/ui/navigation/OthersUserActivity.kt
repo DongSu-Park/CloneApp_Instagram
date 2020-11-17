@@ -130,20 +130,10 @@ class OthersUserActivity : AppCompatActivity() {
         val tsDocFollowing = firestore?.collection("users")?.document(myUid!!)
         firestore?.runTransaction { transaction ->
             // 팔로우 트랜젝션 실행
-            var followDTO = transaction.get(tsDocFollowing!!).toObject(FollowDTO::class.java)
-
-            // 최초 회원 팔로잉 이벤트의 경우 document 레코드 추가
-            if (followDTO == null) {
-                followDTO = FollowDTO()
-                followDTO!!.followingCount = 1
-                followDTO!!.followings[otherUid!!] = true
-
-                transaction.set(tsDocFollowing, followDTO)
-                return@runTransaction
-            }
+            val followDTO = transaction.get(tsDocFollowing!!).toObject(FollowDTO::class.java)
 
             // 이미 당사자에게 팔로워 되어 있는 경우와 그렇지 않는 경우
-            if (followDTO.followings.containsKey(otherUid)) {
+            if (followDTO!!.followings.containsKey(otherUid)) {
                 followDTO.followingCount = followDTO.followingCount - 1
                 followDTO.followings.remove(otherUid)
             } else {
@@ -157,30 +147,19 @@ class OthersUserActivity : AppCompatActivity() {
         // 팔로워 트랜젝션 실행
         val tsDocFollower = firestore?.collection("users")?.document(otherUid!!)
         firestore?.runTransaction { transition ->
-            var followDTO = transition.get(tsDocFollower!!).toObject(FollowDTO::class.java)
-
-            // 최초 회원의 팔로워 이벤트의 경우 document 레코드 추가
-            if (followDTO == null) {
-                followDTO = FollowDTO()
-                followDTO!!.followerCount = 1
-                followDTO!!.followers[myUid!!] = true
-                followerAlarm(otherUid!!)
-
-                transition.set(tsDocFollower, followDTO!!)
-                return@runTransaction
-            }
+            val followDTO = transition.get(tsDocFollower!!).toObject(FollowDTO::class.java)
 
             // 이미 팔로워를 하는 경우와 그렇지 않는 경우
             if (followDTO!!.followers.containsKey(myUid)) {
-                followDTO!!.followerCount = followDTO!!.followerCount - 1
-                followDTO!!.followers.remove(myUid)
+                followDTO.followerCount = followDTO.followerCount - 1
+                followDTO.followers.remove(myUid)
             } else {
-                followDTO!!.followerCount = followDTO!!.followerCount + 1
-                followDTO!!.followers[myUid!!] = true
+                followDTO.followerCount = followDTO.followerCount + 1
+                followDTO.followers[myUid!!] = true
                 // FCM 알람 추가
                 followerAlarm(otherUid!!)
             }
-            transition.set(tsDocFollower, followDTO!!)
+            transition.set(tsDocFollower, followDTO)
             return@runTransaction
         }
     }
@@ -206,6 +185,7 @@ class OthersUserActivity : AppCompatActivity() {
                 if (documentSnapshot == null) {
                     return@addSnapshotListener
                 }
+
                 val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
 
                 // 팔로잉 카운터 가져오기

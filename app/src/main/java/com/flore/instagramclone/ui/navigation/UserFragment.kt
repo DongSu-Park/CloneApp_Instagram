@@ -85,7 +85,7 @@ class UserFragment : Fragment() {
         fragmentView?.iv_account_profile?.setOnClickListener {
             val pictureArray = arrayOf("사진 촬영", "사진 선택")
             val alertDialog = AlertDialog.Builder(activity!!)
-                .setItems(pictureArray, DialogInterface.OnClickListener { dialog, which ->
+                .setItems(pictureArray, DialogInterface.OnClickListener { _, which ->
                     when (which) {
                         0 -> {
                             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -156,7 +156,7 @@ class UserFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var imageview = (holder as CustomViewHolder).imageView
+            val imageview = (holder as CustomViewHolder).imageView
             Glide.with(holder.itemView.context)
                 .load(myContentDTOs[position].imageUrl)
                 .apply(RequestOptions().centerCrop()).into(imageview)
@@ -202,7 +202,7 @@ class UserFragment : Fragment() {
 
                 // 팔로우 카운터 가져오기
                 if (followDTO?.followerCount != null) {
-                    fragmentView?.tv_account_follower_count?.text = followDTO?.followerCount?.toString()
+                    fragmentView?.tv_account_follower_count?.text = followDTO.followerCount.toString()
                 }
             }
     }
