@@ -44,6 +44,9 @@ class OthersUserActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        // 상대의 id 값 텍스트 뷰 세팅
+        tv_otherId.text = otherUserId
+
         // 상대의 프로필 이미지 가져오기
         getProfileImage()
 
@@ -53,6 +56,11 @@ class OthersUserActivity : AppCompatActivity() {
         // 팔로우 버튼을 눌렀을 경우
         btn_others_follow_signout.setOnClickListener {
             requestFollow()
+        }
+
+        // 상단 툴바 백 버튼 클릭
+        btn_back.setOnClickListener {
+            finish()
         }
 
         // 리사이클러뷰 초기화
