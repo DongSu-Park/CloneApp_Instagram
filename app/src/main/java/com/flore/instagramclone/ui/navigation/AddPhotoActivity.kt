@@ -129,7 +129,7 @@ class AddPhotoActivity : AppCompatActivity() {
         }
     }
 
-    fun createImageFile(): File? { // 임시로 이미지 파일 추가
+    private fun createImageFile(): File? { // 임시로 이미지 파일 추가
         val timeStamp : String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageFileName = "JPEG_$timeStamp"
         val path = getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath

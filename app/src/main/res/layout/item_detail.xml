@@ -38,6 +38,7 @@
         android:id="@+id/detailviewitem_imageview_content"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:transitionName="pair_image"
         android:adjustViewBounds="true"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout

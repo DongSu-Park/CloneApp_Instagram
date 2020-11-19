@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -117,6 +119,18 @@ class DetailViewFragment : Fragment() {
                 .override(410, 250)
                 .into(viewHolder.detailviewitem_imageview_content)
 
+            // 이미지 클릭 시 크게 보기 화면으로 인텐트
+            viewHolder.detailviewitem_imageview_content.setOnClickListener {
+                val intent = Intent(activity, DetailImageActivity::class.java)
+                intent.putExtra("imageUri", contentDTOs[position].imageUrl)
+
+                // 전환 애니메이션 도입
+                val pairImage = Pair.create(viewHolder.detailviewitem_imageview_content as View, viewHolder.detailviewitem_imageview_content.transitionName)
+                val optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), pairImage)
+
+                startActivity(intent, optionsCompat.toBundle())
+            }
+
             // 이미지 설명
             viewHolder.detailviewitem_explain_textview.text = contentDTOs[position].explain
 
@@ -151,7 +165,7 @@ class DetailViewFragment : Fragment() {
                 viewHolder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
             }
 
-            // 이미지 클릭 이벤트
+            // 프로필 이미지 클릭 이벤트
             viewHolder.detailviewitem_profile_image.setOnClickListener {
                 // uid는 자기 자신, contentDTOs에 있는 uid는 자기자신 또는 타인
                 if (uid == contentDTOs[position].uid){
