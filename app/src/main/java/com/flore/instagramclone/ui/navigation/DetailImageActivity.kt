@@ -18,25 +18,40 @@ class DetailImageActivity : AppCompatActivity(){
         imageUri = intent.getStringExtra("imageUri")
 
         iv_content_image.setOnClickListener {
-            if (layout_content_box.visibility == View.VISIBLE){
-                // 페이드 아웃 효과 및 가시성 GONE
-                layout_content_box.animate()
-                    .alpha(0f)
-                    .setDuration(200)
-                    .setListener(object : AnimatorListenerAdapter(){
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            layout_content_box.visibility = View.GONE
-                        }
-                    })
-            } else {
-                // 페이드 인 효과 및 가시성 VISIBLE
-                layout_content_box.apply {
-                    alpha = 0f
-                    visibility = View.VISIBLE
+            contentBoxVisible()
+        }
+    }
 
-                    animate().alpha(1f).setDuration(200).setListener(null)
-                }
+    override fun onEnterAnimationComplete() {
+        super.onEnterAnimationComplete()
+        setContent()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        supportFinishAfterTransition()
+        finish()
+    }
+
+    private fun contentBoxVisible() {
+        if (layout_content_box.visibility == View.VISIBLE){
+            // 페이드 아웃 효과 및 가시성 GONE
+            layout_content_box.animate()
+                .alpha(0f)
+                .setDuration(200)
+                .setListener(object : AnimatorListenerAdapter(){
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        layout_content_box.visibility = View.GONE
+                    }
+                })
+        } else {
+            // 페이드 인 효과 및 가시성 VISIBLE
+            layout_content_box.apply {
+                alpha = 0f
+                visibility = View.VISIBLE
+
+                animate().alpha(1f).setDuration(200).setListener(null)
             }
         }
     }
@@ -47,17 +62,5 @@ class DetailImageActivity : AppCompatActivity(){
             .load(imageUri)
             .error(R.drawable.ic_baseline_error_24)
             .into(iv_content_image)
-    }
-
-    override fun onEnterAnimationComplete() {
-        super.onEnterAnimationComplete()
-        setContent()
-
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        supportFinishAfterTransition()
-        finish()
     }
 }

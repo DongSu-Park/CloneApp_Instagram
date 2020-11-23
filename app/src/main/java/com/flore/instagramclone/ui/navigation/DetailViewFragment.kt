@@ -148,6 +148,7 @@ class DetailViewFragment : Fragment() {
                         val url = task.result!!["image"]
                         Glide.with(holder.itemView.context)
                             .load(url)
+                            .error(R.drawable.ic_account)
                             .apply(RequestOptions().circleCrop())
                             .into(viewHolder.detailviewitem_profile_image)
                     }
