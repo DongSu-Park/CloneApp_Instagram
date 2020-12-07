@@ -65,10 +65,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
                 if (followDTO == null) {
                     followDTO = FollowDTO()
-                    followDTO.followerCount = 0
-                    followDTO.followers = HashMap()
-                    followDTO.followingCount = 0
-                    followDTO.followings = HashMap()
+                    followDTO.apply{
+                        followerCount = 0
+                        followers = HashMap()
+                        followingCount = 0
+                        followings = HashMap()
+                    }
+//                    followDTO.followerCount = 0
+//                    followDTO.followers = HashMap()
+//                    followDTO.followingCount = 0
+//                    followDTO.followings = HashMap()
 
                     FirebaseFirestore.getInstance().collection("users").document(uid).set(followDTO)
                 } else {
